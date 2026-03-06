@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wyzn Media</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: #07071a;
+  color: #f0eef8;
+  overflow-x: hidden;
+}
+
+/* ---- BACKGROUND ---- */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #07071a;
+  overflow: hidden;
+}
+.bg-blob1 {
+  position: absolute;
+  width: 800px; height: 700px;
+  top: -200px; left: -180px;
+  background: radial-gradient(ellipse, rgba(88,44,210,0.42) 0%, transparent 65%);
+  border-radius: 50%;
+}
+.bg-blob2 {
+  position: absolute;
+  width: 650px; height: 550px;
+  top: 5%; right: -140px;
+  background: radial-gradient(ellipse, rgba(22,98,218,0.30) 0%, transparent 65%);
+  border-radius: 50%;
+}
+.bg-blob3 {
+  position: absolute;
+  width: 500px; height: 500px;
+  bottom: -80px; left: 25%;
+  background: radial-gradient(ellipse, rgba(168,34,158,0.24) 0%, transparent 65%);
+  border-radius: 50%;
+  animation: pulse 16s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1) translate(0,0); }
+  50% { transform: scale(1.06) translate(20px,-16px); }
+}
+
+canvas#c { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+/* ---- NAV ---- */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 52px;
+  transition: background 0.4s, padding 0.3s;
+}
+nav.stuck {
+  background: rgba(7,7,26,0.90);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  padding: 13px 52px;
+}
+.logo-svg { height: 30px; width: auto; display: block; }
+.logo-svg path { fill: #ffffff; }
+
+.nav-links { display: flex; gap: 34px; list-style: none; }
+.nav-links a {
+  font-size: 0.67rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(240,238,248,0.48); text-decoration: none;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: #f0eef8; }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-book {
+  font-size: 0.67rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #f0eef8;
+  border: 1.5px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  padding: 9px 22px;
+  text-decoration: none; border-radius: 4px;
+  transition: border-color 0.3s;
+}
+.nav-book:hover { border-color: #c0a0ff; }
+
+@media (max-width: 768px) {
+  nav, nav.stuck { padding: 13px 16px; }
+  .nav-links { display: none; }
+}
+
+/* ---- SECTIONS ---- */
+section { position: relative; z-index: 2; }
+
+/* ---- HERO ---- */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 130px 24px 80px;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 0.63rem; font-weight: 500;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: rgba(240,238,248,0.46);
+  border: 1.5px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.05);
+  padding: 7px 18px; border-radius: 100px;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeup 0.7s 0.2s forwards;
+}
+.dot { width: 6px; height: 6px; background: #c0a0ff; border-radius: 50%; display: inline-block; }
+
+h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(3.2rem, 8vw, 8.5rem);
+  font-weight: 900; line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+  opacity: 0;
+  animation: fadeup 1s 0.4s forwards;
+}
+h1 em {
+  font-style: italic; font-weight: 400;
+  display: block;
+  background: linear-gradient(135deg, #c0a0ff 0%, #80c0ff 55%, #f080ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-p {
+  font-size: clamp(0.85rem, 1.3vw, 0.95rem);
+  color: rgba(240,238,248,0.48);
+  max-width: 390px; line-height: 1.9; font-weight: 300;
+  margin-bottom: 44px;
+  opacity: 0;
+  animation: fadeup 0.8s 0.65s forwards;
+}
+
+.hero-btns {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeup 0.8s 0.85s forwards;
+}
+
+/* ---- BUTTONS ---- */
+.btn-p {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: linear-gradient(135deg, #7c3aff, #4a90e2);
+  color: #fff;
+  padding: 13px 32px;
+  font-size: 0.70rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; border-radius: 4px;
+  position: relative; overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.btn-p:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(100,50,220,0.30); }
+
+.btn-g {
+  display: inline-flex; align-items: center; gap: 9px;
+  border: 1.5px solid rgba(255,255,255,0.13);
+  color: rgba(240,238,248,0.52);
+  padding: 13px 32px;
+  font-size: 0.70rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; border-radius: 4px;
+  transition: border-color 0.3s, color 0.3s, transform 0.3s;
+}
+.btn-g:hover { border-color: #c0a0ff; color: #f0eef8; transform: translateY(-2px); }
+
+/* ---- STATS ---- */
+.stats {
+  display: flex;
+  width: 100%; max-width: 680px;
+  margin-top: 72px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  opacity: 0;
+  animation: fadeup 0.8s 1.05s forwards;
+}
+.stat {
+  flex: 1; padding: 22px 0; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.10);
+}
+.stat:last-child { border-right: none; }
+.stat-n {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.1rem; font-weight: 700;
+  display: block; line-height: 1;
+  background: linear-gradient(135deg, #c0a0ff, #80c0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-l {
+  font-size: 0.59rem; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(240,238,248,0.46);
+  margin-top: 6px; display: block;
+}
+@media (max-width: 600px) {
+  .stats { flex-wrap: wrap; }
+  .stat { flex: 0 0 50%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.10); }
+  .stat:nth-child(3), .stat:nth-child(4) { border-bottom: none; }
+}
+
+/* ---- DIVIDER ---- */
+.div {
+  position: relative; z-index: 2;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+}
+
+/* ---- SECTION INNER ---- */
+.inner { padding: 110px 52px; max-width: 1160px; margin: 0 auto; }
+@media (max-width: 768px) { .inner { padding: 70px 18px; } }
+
+.sec-label {
+  font-size: 0.60rem; font-weight: 500;
+  letter-spacing: 0.30em; text-transform: uppercase;
+  color: rgba(240,238,248,0.46);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sec-label::before { content: ''; width: 16px; height: 1px; background: rgba(255,255,255,0.15); }
+
+h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.8rem, 3.6vw, 3.0rem);
+  font-weight: 700; line-height: 1.1;
+  max-width: 520px; margin-bottom: 52px;
+}
+h2 em { font-style: italic; font-weight: 400; color: rgba(240,238,248,0.46); }
+
+/* ---- PROBLEM GRID ---- */
+.p-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.10);
+}
+@media (max-width: 768px) { .p-grid { grid-template-columns: 1fr; } }
+
+.p-card {
+  background: #07071a;
+  padding: 34px 26px;
+  transition: background 0.3s;
+  position: relative;
+}
+.p-card:hover { background: #0e0d28; }
+.p-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(100,60,220,0.05), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.p-card:hover::after { opacity: 1; }
+.p-num {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.2rem; font-weight: 700;
+  color: rgba(255,255,255,0.08);
+  line-height: 1; margin-bottom: 13px;
+}
+.p-title { font-size: 0.81rem; font-weight: 600; margin-bottom: 7px; color: #f0eef8; }
+.p-desc { font-size: 0.73rem; color: rgba(240,238,248,0.48); line-height: 1.85; font-weight: 300; }
+
+/* ---- SOLUTION ---- */
+.s-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 68px; align-items: center;
+  margin-top: 44px;
+}
+@media (max-width: 768px) { .s-grid { grid-template-columns: 1fr; gap: 44px; } }
+
+.s-list { display: flex; flex-direction: column; }
+.s-item {
+  display: flex; gap: 18px; padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+  transition: padding-left 0.3s;
+}
+.s-item:first-child { border-top: 1px solid rgba(255,255,255,0.10); }
+.s-item:hover { padding-left: 10px; }
+.s-num {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.4rem; font-weight: 400;
+  color: rgba(255,255,255,0.10); min-width: 32px; line-height: 1;
+}
+.s-item h4 { font-size: 0.81rem; font-weight: 600; margin-bottom: 4px; color: #f0eef8; }
+.s-item p { font-size: 0.73rem; color: rgba(240,238,248,0.48); line-height: 1.85; font-weight: 300; }
+
+/* ---- FLOATING CARDS ---- */
+.cards-wrap { position: relative; height: 420px; perspective: 750px; }
+@media (max-width: 768px) { .cards-wrap { height: 260px; } }
+
+.fcard {
+  position: absolute;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 20px;
+}
+.fcard.fc1 {
+  width: 232px; top: 0; left: 0;
+  background: linear-gradient(135deg, rgba(80,38,175,0.45), rgba(38,58,138,0.25));
+  animation: fl1 7s ease-in-out infinite;
+}
+.fcard.fc2 {
+  width: 216px; top: 90px; right: 0;
+  background: linear-gradient(135deg, rgba(22,72,182,0.40), rgba(54,22,135,0.25));
+  animation: fl2 6s ease-in-out infinite;
+}
+.fcard.fc3 {
+  width: 202px; bottom: 0; left: 28px;
+  background: linear-gradient(135deg, rgba(106,22,118,0.40), rgba(54,32,162,0.24));
+  animation: fl3 8s ease-in-out infinite;
+}
+@keyframes fl1 { 0%,100% { transform: rotateY(-6deg) rotateX(3deg) translateY(0); } 50% { transform: rotateY(-6deg) rotateX(3deg) translateY(-10px); } }
+@keyframes fl2 { 0%,100% { transform: rotateY(5deg) rotateX(-2deg) translateY(0); } 50% { transform: rotateY(5deg) rotateX(-2deg) translateY(-8px); } }
+@keyframes fl3 { 0%,100% { transform: rotateY(-3deg) rotateX(4deg) translateY(0); } 50% { transform: rotateY(-3deg) rotateX(4deg) translateY(-7px); } }
+
+.fcard-icon { font-size: 1.3rem; margin-bottom: 9px; }
+.fcard-tag { font-size: 0.56rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #c0a0ff; margin-bottom: 5px; }
+.fcard-h { font-size: 0.76rem; font-weight: 600; margin-bottom: 3px; color: #f0eef8; }
+.fcard-p { font-size: 0.69rem; color: rgba(240,238,248,0.50); line-height: 1.65; font-weight: 300; }
+.fcard-metric {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.2rem; font-weight: 700;
+  background: linear-gradient(135deg, #c0a0ff, #80c0ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fcard-metric small {
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.54rem; letter-spacing: 0.12em; text-transform: uppercase;
+  display: block; margin-top: 2px;
+  color: rgba(240,238,248,0.46);
+  -webkit-text-fill-color: rgba(240,238,248,0.46);
+}
+
+/* ---- WHY GRID ---- */
+.w-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1px; background: rgba(255,255,255,0.10);
+  margin-top: 52px;
+}
+@media (max-width: 768px) { .w-grid { grid-template-columns: 1fr; } }
+
+.w-card {
+  background: #07071a;
+  padding: 38px 34px;
+  position: relative;
+  transition: background 0.3s;
+}
+.w-card:hover { background: #0e0d28; }
+.w-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #c0a0ff, transparent);
+  transform: scaleX(0); transition: transform 0.4s;
+}
+.w-card:hover::before { transform: scaleX(1); }
+.w-icon { font-size: 1.2rem; margin-bottom: 13px; }
+.w-card h3 { font-size: 0.81rem; font-weight: 600; margin-bottom: 7px; color: #f0eef8; }
+.w-card p { font-size: 0.73rem; color: rgba(240,238,248,0.48); line-height: 1.85; font-weight: 300; }
+
+/* ---- CTA ---- */
+#cta {
+  padding: 130px 24px; text-align: center;
+  position: relative; z-index: 2;
+}
+#cta::before {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(90,45,220,0.09) 0%, transparent 65%);
+  z-index: 0; pointer-events: none;
+}
+#cta > * { position: relative; z-index: 1; }
+
+.cta-label {
+  font-size: 0.60rem; font-weight: 500;
+  letter-spacing: 0.30em; text-transform: uppercase;
+  color: rgba(240,238,248,0.46);
+  margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.cta-label::before { content: ''; width: 16px; height: 1px; background: rgba(255,255,255,0.15); }
+
+h2.cta-h {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.5rem, 5.5vw, 5.5rem);
+  font-weight: 900; line-height: 1.05;
+  margin-bottom: 16px; max-width: none;
+}
+h2.cta-h em {
+  font-style: italic; font-weight: 400;
+  background: linear-gradient(135deg, #c0a0ff, #80c0ff, #f080ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cta-sub {
+  font-size: 0.88rem; color: rgba(240,238,248,0.48);
+  max-width: 350px; margin: 0 auto 40px;
+  line-height: 1.9; font-weight: 300;
+}
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 26px; }
+.cta-note { font-size: 0.66rem; color: rgba(240,238,248,0.46); letter-spacing: 0.08em; }
+.cta-note a { color: #c0a0ff; text-decoration: none; }
+.cta-note a:hover { color: #80c0ff; }
+
+/* ---- FOOTER ---- */
+footer {
+  position: relative; z-index: 2;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  padding: 28px 52px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.f-logo { display: flex; align-items: center; height: 22px; }
+.f-logo svg { height: 22px; width: auto; }
+.f-logo svg path { fill: #ffffff; }
+.f-copy { font-size: 0.62rem; color: rgba(240,238,248,0.40); letter-spacing: 0.10em; }
+.f-links { display: flex; gap: 20px; }
+.f-links a { font-size: 0.62rem; color: rgba(240,238,248,0.40); text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.3s; }
+.f-links a:hover { color: #f0eef8; }
+
+@media (max-width: 768px) {
+  footer { flex-direction: column; gap: 14px; text-align: center; padding: 22px 16px; }
+  .f-links { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ---- REVEAL ---- */
+.rv { opacity: 0; transform: translateY(22px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.rv.on { opacity: 1; transform: translateY(0); }
+.d1 { transition-delay: 0.08s; }
+.d2 { transition-delay: 0.17s; }
+.d3 { transition-delay: 0.26s; }
+.d4 { transition-delay: 0.35s; }
+
+@keyframes fadeup { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #07071a; }
+::-webkit-scrollbar-thumb { background: rgba(120,80,220,0.30); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg">
+  <div class="bg-blob1"></div>
+  <div class="bg-blob2"></div>
+  <div class="bg-blob3"></div>
+</div>
+<canvas id="c"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" style="display:flex;align-items:center;height:30px;text-decoration:none;" aria-label="Wyzn Media">
+    <svg viewBox="200 160 570 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:30px;width:auto;display:block;">
+      <path fill="#ffffff" d="M363 322L317 177H379L411 268L431 255L411 322H363Z"/>
+      <path fill="#ffffff" d="M453.4 322L407.4 177H469.4L501.4 268L521.4 255L501.4 322H453.4Z"/>
+      <path fill="#ffffff" d="M521.619 254L495 177H561.6L590 254H521.619Z"/>
+      <path fill="#ffffff" d="M666.54 200.901L658.434 232H649.263L644.302 211.533L639.163 232H629.993L622.107 200.901H630.214L634.689 223.539L640.226 200.901H648.555L653.871 223.539L658.389 200.901H666.54ZM695.59 207.281L680.085 243.74H671.934L677.605 231.158L667.549 207.281H676.01L681.725 222.741L687.395 207.281H695.59ZM705.418 225.754H716.138V232H696.956V225.975L707.234 213.527H697.045V207.281H715.917V213.305L705.418 225.754ZM735.369 207.015C738.263 207.015 740.567 207.96 742.28 209.85C744.022 211.711 744.893 214.28 744.893 217.558V232H737.362V218.577C737.362 216.923 736.934 215.639 736.078 214.723C735.221 213.807 734.069 213.35 732.622 213.35C731.175 213.35 730.023 213.807 729.167 214.723C728.31 215.639 727.882 216.923 727.882 218.577V232H720.307V207.281H727.882V210.559C728.65 209.466 729.684 208.61 730.983 207.989C732.283 207.34 733.744 207.015 735.369 207.015ZM658.965 266.901V298H651.39V279.35L644.435 298H638.321L631.322 279.305V298H623.747V266.901H632.695L641.422 288.431L650.061 266.901H658.965ZM687.714 285.242C687.714 285.95 687.67 286.689 687.582 287.457H670.437C670.556 288.992 671.043 290.174 671.899 291.001C672.785 291.798 673.863 292.197 675.133 292.197C677.023 292.197 678.338 291.399 679.076 289.805H687.139C686.725 291.429 685.972 292.891 684.879 294.19C683.816 295.49 682.472 296.509 680.848 297.247C679.224 297.985 677.407 298.354 675.399 298.354C672.977 298.354 670.821 297.838 668.931 296.804C667.041 295.77 665.564 294.294 664.501 292.374C663.438 290.454 662.906 288.21 662.906 285.64C662.906 283.071 663.423 280.826 664.457 278.907C665.52 276.987 666.997 275.51 668.887 274.477C670.777 273.443 672.948 272.926 675.399 272.926C677.791 272.926 679.918 273.428 681.778 274.432C683.639 275.437 685.086 276.869 686.12 278.729C687.183 280.59 687.714 282.761 687.714 285.242ZM679.962 283.248C679.962 281.949 679.519 280.915 678.633 280.147C677.747 279.379 676.639 278.995 675.31 278.995C674.04 278.995 672.963 279.364 672.077 280.103C671.22 280.841 670.688 281.89 670.482 283.248H679.962ZM690.205 285.596C690.205 283.056 690.677 280.826 691.622 278.907C692.597 276.987 693.911 275.51 695.565 274.477C697.219 273.443 699.065 272.926 701.102 272.926C702.727 272.926 704.203 273.266 705.532 273.945C706.891 274.624 707.954 275.54 708.722 276.692V265.218H716.297V298H708.722V294.456C708.013 295.637 706.994 296.582 705.665 297.291C704.366 298 702.845 298.354 701.102 298.354C699.065 298.354 697.219 297.838 695.565 296.804C693.911 295.741 692.597 294.249 691.622 292.33C690.677 290.38 690.205 288.136 690.205 285.596ZM708.722 285.64C708.722 283.75 708.19 282.259 707.127 281.166C706.093 280.073 704.824 279.527 703.317 279.527C701.811 279.527 700.526 280.073 699.463 281.166C698.43 282.229 697.913 283.706 697.913 285.596C697.913 287.486 698.43 288.992 699.463 290.115C700.526 291.207 701.811 291.754 703.317 291.754C704.824 291.754 706.093 291.207 707.127 290.115C708.19 289.022 708.722 287.53 708.722 285.64ZM725.587 270.711C724.258 270.711 723.166 270.327 722.309 269.559C721.482 268.762 721.069 267.787 721.069 266.636C721.069 265.454 721.482 264.48 722.309 263.712C723.166 262.914 724.258 262.516 725.587 262.516C726.887 262.516 727.95 262.914 728.777 263.712C729.634 264.48 730.062 265.454 730.062 266.636C730.062 267.787 729.634 268.762 728.777 269.559C727.95 270.327 726.887 270.711 725.587 270.711ZM729.353 273.281V298H721.778V273.281H729.353ZM733.336 285.596C733.336 283.056 733.809 280.826 734.754 278.907C735.729 276.987 737.043 275.51 738.697 274.477C740.351 273.443 742.196 272.926 744.234 272.926C745.977 272.926 747.498 273.281 748.797 273.989C750.126 274.698 751.145 275.628 751.854 276.78V273.281H759.429V298H751.854V294.5C751.116 295.652 750.082 296.582 748.753 297.291C747.453 298 745.932 298.354 744.19 298.354C742.182 298.354 740.351 297.838 738.697 296.804C737.043 295.741 735.729 294.249 734.754 292.33C733.809 290.38 733.336 288.136 733.336 285.596ZM751.854 285.64C751.854 283.75 751.322 282.259 750.259 281.166C749.225 280.073 747.955 279.527 746.449 279.527C744.943 279.527 743.658 280.073 742.595 281.166C741.562 282.229 741.045 283.706 741.045 285.596C741.045 287.486 741.562 288.992 742.595 290.115C743.658 291.207 744.943 291.754 746.449 291.754C747.955 291.754 749.225 291.207 750.259 290.115C751.322 289.022 751.854 287.53 751.854 285.64Z"/>
+    </svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#problems">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#why">Why Us</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://calendly.com/businessyasht/30min" target="_blank" class="nav-book">Book a Call</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-tag"><span class="dot"></span> AI-Powered Marketing</div>
+  <h1>More Bookings.<br><em>Less Effort.</em></h1>
+  <p class="hero-p">We grow your business with AI automation and precision paid advertising — so your calendar fills itself.</p>
+  <div class="hero-btns">
+    <a href="https://calendly.com/businessyasht/30min" target="_blank" class="btn-p">
+      <span>Book a Free Call</span><span>→</span>
+    </a>
+    <a href="#solution" class="btn-g">See How</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-n">3×</span><span class="stat-l">More Leads</span></div>
+    <div class="stat"><span class="stat-n">24/7</span><span class="stat-l">AI Active</span></div>
+    <div class="stat"><span class="stat-n">48h</span><span class="stat-l">Go Live</span></div>
+    <div class="stat"><span class="stat-n">0</span><span class="stat-l">Extra Staff</span></div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- PROBLEMS -->
+<section id="problems">
+  <div class="inner">
+    <div class="sec-label rv">The Problem</div>
+    <h2 class="rv d1">Your business is losing revenue <em>every day</em></h2>
+    <div class="p-grid">
+      <div class="p-card rv d1"><div class="p-num">01</div><div class="p-title">Leads Go Cold</div><div class="p-desc">Slow responses let clients book elsewhere. Every hour costs you.</div></div>
+      <div class="p-card rv d2"><div class="p-num">02</div><div class="p-title">Wasted Ad Budget</div><div class="p-desc">Untargeted campaigns burn cash with no consistent ROI.</div></div>
+      <div class="p-card rv d3"><div class="p-num">03</div><div class="p-title">DM Overload</div><div class="p-desc">Your team can't keep up. Inconsistent follow-up kills conversions.</div></div>
+      <div class="p-card rv d1"><div class="p-num">04</div><div class="p-title">No Pipeline</div><div class="p-desc">Revenue swings week to week. No system means no stability.</div></div>
+      <div class="p-card rv d2"><div class="p-num">05</div><div class="p-title">Unqualified Leads</div><div class="p-desc">Time wasted on people who aren't ready to buy.</div></div>
+      <div class="p-card rv d3"><div class="p-num">06</div><div class="p-title">No Retargeting</div><div class="p-desc">Warm audiences who showed interest — forgotten, never converted.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="inner">
+    <div class="sec-label rv">Our System</div>
+    <div class="s-grid">
+      <div>
+        <h2 class="rv d1" style="margin-bottom:0">We fix it —<br><em>completely.</em></h2>
+        <div class="s-list" style="margin-top:36px">
+          <div class="s-item rv d1"><div class="s-num">01</div><div><h4>AI DM Automation</h4><p>Instant replies that qualify leads and book appointments — 24/7.</p></div></div>
+          <div class="s-item rv d2"><div class="s-num">02</div><div><h4>Meta Ad Campaigns</h4><p>High-converting Facebook & Instagram ads built for real bookings.</p></div></div>
+          <div class="s-item rv d3"><div class="s-num">03</div><div><h4>Lead Nurturing</h4><p>Automated follow-up — no lead left behind.</p></div></div>
+          <div class="s-item rv d4"><div class="s-num">04</div><div><h4>Monthly Reporting</h4><p>Clear data on every dollar spent with ongoing optimisation.</p></div></div>
+        </div>
+      </div>
+      <div class="cards-wrap rv d2">
+        <div class="fcard fc1"><div class="fcard-icon">🤖</div><div class="fcard-tag">AI Response</div><div class="fcard-h">Instant Lead Reply</div><div class="fcard-p">Qualifies and converts every DM automatically.</div><div class="fcard-metric">98%<small>Response Rate</small></div></div>
+        <div class="fcard fc2"><div class="fcard-icon">📊</div><div class="fcard-tag">Meta Ads</div><div class="fcard-h">Precision Targeting</div><div class="fcard-p">Optimised for bookings, not just clicks.</div><div class="fcard-metric">3.2×<small>Average ROAS</small></div></div>
+        <div class="fcard fc3"><div class="fcard-icon">📅</div><div class="fcard-tag">Auto Booking</div><div class="fcard-h">Calendar Fills Itself</div><div class="fcard-p">Qualified leads flow to your booking page.</div><div class="fcard-metric">+40%<small>Booking Rate</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="inner">
+    <div class="sec-label rv">Why Wyzn Media</div>
+    <h2 class="rv d1">Built different.<br><em>Built for results.</em></h2>
+    <div class="w-grid">
+      <div class="w-card rv d1"><div class="w-icon">⚡</div><h3>Live in 48 Hours</h3><p>Your AI automation is running within days, not months.</p></div>
+      <div class="w-card rv d2"><div class="w-icon">🔗</div><h3>Full-Stack System</h3><p>Ads, automation, follow-up, and reporting — one agency, one system.</p></div>
+      <div class="w-card rv d3"><div class="w-icon">📈</div><h3>Results-Driven</h3><p>We obsess over your cost per booking — that's what matters.</p></div>
+      <div class="w-card rv d4"><div class="w-icon">🎯</div><h3>Zero Guesswork</h3><p>Every decision backed by data. No vanity metrics, no wasted spend.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-label">Get Started</div>
+  <h2 class="cta-h rv d1">Ready to scale<br><em>your business?</em></h2>
+  <p class="cta-sub rv d2">Free 30-min strategy call. We'll show you exactly how our system drives growth.</p>
+  <div class="cta-btns rv d3">
+    <a href="https://calendly.com/businessyasht/30min" target="_blank" class="btn-p"><span>Book Your Free Call</span><span>→</span></a>
+    <a href="mailto:wyznmedia@gmail.com" class="btn-g">Email Us</a>
+  </div>
+  <p class="cta-note rv d4">Or reach us at <a href="mailto:wyznmedia@gmail.com">wyznmedia@gmail.com</a></p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">
+    <svg viewBox="200 160 570 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:22px;width:auto">
+      <path fill="#ffffff" d="M363 322L317 177H379L411 268L431 255L411 322H363Z"/>
+      <path fill="#ffffff" d="M453.4 322L407.4 177H469.4L501.4 268L521.4 255L501.4 322H453.4Z"/>
+      <path fill="#ffffff" d="M521.619 254L495 177H561.6L590 254H521.619Z"/>
+      <path fill="#ffffff" d="M666.54 200.901L658.434 232H649.263L644.302 211.533L639.163 232H629.993L622.107 200.901H630.214L634.689 223.539L640.226 200.901H648.555L653.871 223.539L658.389 200.901H666.54ZM695.59 207.281L680.085 243.74H671.934L677.605 231.158L667.549 207.281H676.01L681.725 222.741L687.395 207.281H695.59ZM705.418 225.754H716.138V232H696.956V225.975L707.234 213.527H697.045V207.281H715.917V213.305L705.418 225.754ZM735.369 207.015C738.263 207.015 740.567 207.96 742.28 209.85C744.022 211.711 744.893 214.28 744.893 217.558V232H737.362V218.577C737.362 216.923 736.934 215.639 736.078 214.723C735.221 213.807 734.069 213.35 732.622 213.35C731.175 213.35 730.023 213.807 729.167 214.723C728.31 215.639 727.882 216.923 727.882 218.577V232H720.307V207.281H727.882V210.559C728.65 209.466 729.684 208.61 730.983 207.989C732.283 207.34 733.744 207.015 735.369 207.015ZM658.965 266.901V298H651.39V279.35L644.435 298H638.321L631.322 279.305V298H623.747V266.901H632.695L641.422 288.431L650.061 266.901H658.965ZM687.714 285.242C687.714 285.95 687.67 286.689 687.582 287.457H670.437C670.556 288.992 671.043 290.174 671.899 291.001C672.785 291.798 673.863 292.197 675.133 292.197C677.023 292.197 678.338 291.399 679.076 289.805H687.139C686.725 291.429 685.972 292.891 684.879 294.19C683.816 295.49 682.472 296.509 680.848 297.247C679.224 297.985 677.407 298.354 675.399 298.354C672.977 298.354 670.821 297.838 668.931 296.804C667.041 295.77 665.564 294.294 664.501 292.374C663.438 290.454 662.906 288.21 662.906 285.64C662.906 283.071 663.423 280.826 664.457 278.907C665.52 276.987 666.997 275.51 668.887 274.477C670.777 273.443 672.948 272.926 675.399 272.926C677.791 272.926 679.918 273.428 681.778 274.432C683.639 275.437 685.086 276.869 686.12 278.729C687.183 280.59 687.714 282.761 687.714 285.242ZM679.962 283.248C679.962 281.949 679.519 280.915 678.633 280.147C677.747 279.379 676.639 278.995 675.31 278.995C674.04 278.995 672.963 279.364 672.077 280.103C671.22 280.841 670.688 281.89 670.482 283.248H679.962ZM690.205 285.596C690.205 283.056 690.677 280.826 691.622 278.907C692.597 276.987 693.911 275.51 695.565 274.477C697.219 273.443 699.065 272.926 701.102 272.926C702.727 272.926 704.203 273.266 705.532 273.945C706.891 274.624 707.954 275.54 708.722 276.692V265.218H716.297V298H708.722V294.456C708.013 295.637 706.994 296.582 705.665 297.291C704.366 298 702.845 298.354 701.102 298.354C699.065 298.354 697.219 297.838 695.565 296.804C693.911 295.741 692.597 294.249 691.622 292.33C690.677 290.38 690.205 288.136 690.205 285.596ZM708.722 285.64C708.722 283.75 708.19 282.259 707.127 281.166C706.093 280.073 704.824 279.527 703.317 279.527C701.811 279.527 700.526 280.073 699.463 281.166C698.43 282.229 697.913 283.706 697.913 285.596C697.913 287.486 698.43 288.992 699.463 290.115C700.526 291.207 701.811 291.754 703.317 291.754C704.824 291.754 706.093 291.207 707.127 290.115C708.19 289.022 708.722 287.53 708.722 285.64ZM725.587 270.711C724.258 270.711 723.166 270.327 722.309 269.559C721.482 268.762 721.069 267.787 721.069 266.636C721.069 265.454 721.482 264.48 722.309 263.712C723.166 262.914 724.258 262.516 725.587 262.516C726.887 262.516 727.95 262.914 728.777 263.712C729.634 264.48 730.062 265.454 730.062 266.636C730.062 267.787 729.634 268.762 728.777 269.559C727.95 270.327 726.887 270.711 725.587 270.711ZM729.353 273.281V298H721.778V273.281H729.353ZM733.336 285.596C733.336 283.056 733.809 280.826 734.754 278.907C735.729 276.987 737.043 275.51 738.697 274.477C740.351 273.443 742.196 272.926 744.234 272.926C745.977 272.926 747.498 273.281 748.797 273.989C750.126 274.698 751.145 275.628 751.854 276.78V273.281H759.429V298H751.854V294.5C751.116 295.652 750.082 296.582 748.753 297.291C747.453 298 745.932 298.354 744.19 298.354C742.182 298.354 740.351 297.838 738.697 296.804C737.043 295.741 735.729 294.249 734.754 292.33C733.809 290.38 733.336 288.136 733.336 285.596ZM751.854 285.64C751.854 283.75 751.322 282.259 750.259 281.166C749.225 280.073 747.955 279.527 746.449 279.527C744.943 279.527 743.658 280.073 742.595 281.166C741.562 282.229 741.045 283.706 741.045 285.596C741.045 287.486 741.562 288.992 742.595 290.115C743.658 291.207 744.943 291.754 746.449 291.754C747.955 291.754 749.225 291.207 750.259 290.115C751.322 289.022 751.854 287.53 751.854 285.64Z"/>
+    </svg>
+  </div>
+  <div class="f-copy">© 2026 Wyzn Media. All rights reserved.</div>
+  <div class="f-links">
+    <a href="https://calendly.com/businessyasht/30min" target="_blank">Book a Call</a>
+    <a href="mailto:wyznmedia@gmail.com">Contact</a>
+  </div>
+</footer>
+
+<script>
+/* NAV */
+var nav = document.getElementById('nav');
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 40) { nav.classList.add('stuck'); }
+  else { nav.classList.remove('stuck'); }
+}, false);
+
+/* REVEAL ON SCROLL */
+var items = document.querySelectorAll('.rv');
+function checkReveal() {
+  var wh = window.innerHeight;
+  for (var i = 0; i < items.length; i++) {
+    var top = items[i].getBoundingClientRect().top;
+    if (top < wh - 60) { items[i].classList.add('on'); }
+  }
+}
+window.addEventListener('scroll', checkReveal, false);
+checkReveal();
+
+/* PARTICLES */
+var canvas = document.getElementById('c');
+var ctx = canvas.getContext('2d');
+var W = 0, H = 0;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize, false);
+
+var pts = [];
+for (var i = 0; i < 55; i++) {
+  pts.push({
+    x: Math.random() * 1800, y: Math.random() * 1000,
+    vx: (Math.random() - 0.5) * 0.18,
+    vy: (Math.random() - 0.5) * 0.18,
+    r: Math.random() * 0.9 + 0.25,
+    a: Math.random() * 0.15 + 0.04,
+    ci: i % 3
+  });
+}
+var pmx = 600, pmy = 400;
+document.addEventListener('mousemove', function(e) { pmx = e.clientX; pmy = e.clientY; }, false);
+
+var cols = ['rgba(120,70,230,', 'rgba(60,120,230,', 'rgba(185,50,200,'];
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (var i = 0; i < pts.length; i++) {
+    var p = pts[i];
+    var dx = pmx - p.x, dy = pmy - p.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 220) { p.vx += dx / dist * 0.002; p.vy += dy / dist * 0.002; }
+    p.vx *= 0.99; p.vy *= 0.99;
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    for (var j = i + 1; j < pts.length; j++) {
+      var q = pts[j];
+      var d2 = Math.sqrt((p.x-q.x)*(p.x-q.x) + (p.y-q.y)*(p.y-q.y));
+      if (d2 < 110) {
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = 'rgba(100,65,210,' + (0.03 * (1 - d2 / 110)) + ')';
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = cols[p.ci] + p.a + ')';
+    ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
